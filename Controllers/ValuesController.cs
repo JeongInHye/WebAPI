@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Modules;
+using MySql.Data.MySqlClient;
+using System.Collections;
 
 namespace WebAPI.Controllers
 {
@@ -12,33 +15,28 @@ namespace WebAPI.Controllers
     {
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<ArrayList> Get()
         {
-            return new string[] { "value1", "value2" };
-        }
+            MYsql my = new MYsql();
+            string sql = "select * from test;";
+            ArrayList list = new ArrayList();
+            MySqlDataReader sdr = my.Reader(sql);
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
-        {
-            return "value";
+            while (sdr.Read())
+            {
+                Hashtable ht = new Hashtable();
+                for (int i = 0; i < sdr.FieldCount; i++)
+                {
+                    ht.Add(sdr.GetName(i),sdr.GetValue(i));
+                }
+                list.Add(ht);
+            }
+            return list;
         }
 
         // POST api/values
         [HttpPost]
         public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
         {
         }
     }
